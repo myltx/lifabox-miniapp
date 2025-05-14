@@ -17,8 +17,8 @@ export default defineUniPages({
     },
   },
   tabBar: {
-    color: '#999999',
-    selectedColor: '#018d71',
+    color: '#707070',
+    selectedColor: '#8433e2',
     backgroundColor: '#F8F8F8',
     borderStyle: 'black',
     height: '50px',
@@ -28,15 +28,15 @@ export default defineUniPages({
     list: [
       {
         iconPath: 'static/tabbar/home.png',
-        selectedIconPath: 'static/tabbar/homeHL.png',
+        selectedIconPath: 'static/tabbar/home_active.png',
         pagePath: 'pages/index/index',
         text: '首页',
       },
       {
-        iconPath: 'static/tabbar/example.png',
-        selectedIconPath: 'static/tabbar/exampleHL.png',
+        iconPath: 'static/tabbar/my.png',
+        selectedIconPath: 'static/tabbar/my_active.png',
         pagePath: 'pages/about/about',
-        text: '关于',
+        text: '我的',
       },
     ],
   },

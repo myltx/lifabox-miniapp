@@ -14,8 +14,8 @@
     }
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#018d71",
+    "color": "#707070",
+    "selectedColor": "#8433e2",
     "backgroundColor": "#F8F8F8",
     "borderStyle": "black",
     "height": "50px",
@@ -25,32 +25,36 @@
     "list": [
       {
         "iconPath": "static/tabbar/home.png",
-        "selectedIconPath": "static/tabbar/homeHL.png",
+        "selectedIconPath": "static/tabbar/home_active.png",
         "pagePath": "pages/index/index",
         "text": "首页"
       },
       {
-        "iconPath": "static/tabbar/example.png",
-        "selectedIconPath": "static/tabbar/exampleHL.png",
+        "iconPath": "static/tabbar/my.png",
+        "selectedIconPath": "static/tabbar/my_active.png",
         "pagePath": "pages/about/about",
-        "text": "关于"
+        "text": "我的"
       }
     ]
   },
   "pages": [
     {
       "path": "pages/index/index",
-      "type": "home",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTitleText": "首页"
-      }
+      "type": "home"
     },
     {
       "path": "pages/about/about",
       "type": "page",
       "style": {
         "navigationBarTitleText": "关于"
+      }
+    },
+    {
+      "path": "pages/learn/index",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "学习"
       }
     }
   ],
