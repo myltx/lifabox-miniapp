@@ -35,7 +35,7 @@ export default defineUniPages({
       {
         iconPath: 'static/tabbar/my.png',
         selectedIconPath: 'static/tabbar/my_active.png',
-        pagePath: 'pages/about/about',
+        pagePath: 'pages/profile/index',
         text: '我的',
       },
     ],

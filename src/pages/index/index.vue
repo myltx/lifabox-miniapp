@@ -34,7 +34,10 @@
       </view>
 
       <!-- 当前日期 -->
-      <view class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center justify-between">
+      <view
+        class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center justify-between"
+        @click="onPunchSuccess"
+      >
         <text class="text-gray-500 text-sm">当前日期</text>
         <view class="text-xl font-semibold text-gray-700 mt-1">2025-05-14</view>
       </view>
@@ -58,10 +61,13 @@
         <text class="text-sm text-red-500">{{ item.expireDate }}</text>
       </view>
     </view>
+    <Fireworks ref="fireworksRef" />
   </view>
 </template>
 
 <script setup lang="ts">
+import Fireworks from '@/components/Fireworks/index.vue'
+const fireworksRef = ref<InstanceType<typeof Fireworks>>()
 const expireSoonItems = [
   { id: 1, name: '牛奶', expireDate: '2025-05-15' },
   { id: 2, name: '鸡蛋', expireDate: '2025-05-17' },
@@ -69,6 +75,10 @@ const expireSoonItems = [
 
 function goTo(page: string) {
   uni.navigateTo({ url: `/pages/${page}/index` })
+}
+
+const onPunchSuccess = () => {
+  fireworksRef.value?.startFireworks() // 播放 3 秒
 }
 </script>
 
