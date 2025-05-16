@@ -50,6 +50,22 @@
       }
     },
     {
+      "path": "pages/items/add",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "新增物品"
+      }
+    },
+    {
+      "path": "pages/items/index",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "物品"
+      }
+    },
+    {
       "path": "pages/learn/index",
       "type": "page",
       "layout": "default",

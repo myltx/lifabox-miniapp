@@ -43,6 +43,8 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from 'wot-design-uni'
+const toast = useToast()
 const menuList = [
   {
     title: '我的收藏',
@@ -71,7 +73,8 @@ const menuList = [
 ]
 
 function goTo(path: string) {
-  uni.navigateTo({ url: path })
+  toast.show('功能开发中,敬请期待')
+  //   uni.navigateTo({ url: path })
 }
 </script>
 
