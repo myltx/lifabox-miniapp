@@ -6,6 +6,7 @@
     >
       LifaBox 生活助手
     </view>
+    <ContributionCalendar />
 
     <!-- 信息卡片区（打卡 + 物品 + 日期天气） -->
     <view class="grid grid-cols-2 gap-4">
@@ -67,6 +68,7 @@
 
 <script setup lang="ts">
 import Fireworks from '@/components/Fireworks/index.vue'
+import ContributionCalendar from '@/components/ContributionCalendar/index.vue'
 const fireworksRef = ref<InstanceType<typeof Fireworks>>()
 const expireSoonItems = [
   { id: 1, name: '牛奶', expireDate: '2025-05-15' },
