@@ -19,12 +19,14 @@
             label="物品名称"
             placeholder="请输入物品名称"
             clearable
+            align-right
           />
 
           <wd-select-picker
             label="物品分类"
             v-model="formData.categoryId"
             :columns="categories"
+            align-right
           ></wd-select-picker>
 
           <!-- 生产日期 -->
@@ -34,22 +36,31 @@
             type="date"
             value-format="YYYY-MM-DD"
             placeholder="请选择生产日期"
+            align-right
           />
 
           <!-- 保质期 -->
-          <wd-cell title="保质期">
-            <view class="shelf-life-input">
-              <wd-input
-                v-model="formData.shelfLife"
-                type="number"
-                placeholder="输入保质期"
-                style="width: 300px"
-              />
-              <wd-picker v-model="formData.timeUnit" :columns="timeUnits" style="width: 190px">
+          <wd-input
+            v-model="formData.shelfLife"
+            type="number"
+            placeholder="输入保质期"
+            style="width: 120px"
+            label="保质期"
+            align-right
+          >
+            <template #suffix>
+              <wd-picker
+                ref="timeUnitPicker"
+                v-model="formData.timeUnit"
+                :columns="timeUnits"
+                custom-class="custom-picker"
+                style="width: 10px"
+                use-default-slot
+              >
                 <view class="time-unit-text">{{ getTimeUnitText(formData.timeUnit) }}</view>
               </wd-picker>
-            </view>
-          </wd-cell>
+            </template>
+          </wd-input>
 
           <!-- 过期日期（自动计算，只读） -->
           <wd-cell title="过期日期">
@@ -96,6 +107,7 @@ const formData = ref({
   remark: '',
 })
 
+const timeUnitPicker = ref(null)
 // 分类选择器显示控制
 const showCategoryPicker = ref(false)
 
@@ -223,9 +235,12 @@ const onSubmit = () => {
     },
   })
 }
+const showTimeUnitPicker = () => {
+  timeUnitPicker.value.open()
+}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .page-container {
   min-height: 100vh;
   padding-bottom: 120px;
@@ -285,11 +300,11 @@ const onSubmit = () => {
 
 .time-unit-text {
   min-width: 40px;
-  padding: 4px 8px;
+  /* padding: 4px 8px; */
   font-size: 14px;
   color: #333;
   text-align: center;
-  border: 1px solid #ddd;
+  // border: 1px solid #ddd;
   border-radius: 4px;
 }
 
@@ -330,5 +345,11 @@ const onSubmit = () => {
 
 :deep(.wd-input__inner) {
   text-align: center;
+}
+.cutom-picker {
+  .wd-picker__cell {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 </style>
