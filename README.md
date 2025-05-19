@@ -114,3 +114,12 @@ pnpm build:mp-weixin
 ## 📄 License
 
 MIT License © 2025-present [your-name]
+
+| 文件名                        | 表名            | 用途             |
+| ----------------------------- | --------------- | ---------------- |
+| `user_profile.schema.json`    | user_profile    | 用户资料扩展     |
+| `clock_records.schema.json`   | clock_records   | 用户打卡记录     |
+| `item_categories.schema.json` | item_categories | 物品分类         |
+| `items.schema.json`           | items           | 物品记录         |
+| `notifications.schema.json`   | notifications   | 到期提醒通知记录 |
+| `feedbacks.schema.json`       | feedbacks       | 用户反馈         |

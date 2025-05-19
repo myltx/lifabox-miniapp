@@ -1,0 +1,1 @@
+{"bsonType":"object","required":["_id","created_at","updated_at"],"properties":{"_id":{"bsonType":"string","description":"与 uni-id 用户 _id 一致"},"nickname":{"bsonType":"string"},"avatar":{"bsonType":"string"},"gender":{"bsonType":"int","minimum":0,"maximum":2},"birthday":{"bsonType":"string"},"created_at":{"bsonType":"timestamp"},"updated_at":{"bsonType":"timestamp"}}}

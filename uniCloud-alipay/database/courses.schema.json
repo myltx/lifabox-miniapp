@@ -1,0 +1,1 @@
+{"bsonType":"object","required":["name","start_time","description","duration_days"],"properties":{"name":{"bsonType":"string","description":"课程名称"},"start_time":{"bsonType":"date","description":"课程开始时间"},"description":{"bsonType":"string","description":"课程描述，包含授课人及课程内容"},"duration_days":{"bsonType":"int","description":"课程周期，单位为天"}}}

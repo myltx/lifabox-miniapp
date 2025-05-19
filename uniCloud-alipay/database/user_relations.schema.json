@@ -1,0 +1,1 @@
+{"bsonType":"object","required":["user_id","related_user_id"],"properties":{"user_id":{"bsonType":"string","description":"当前用户 _id"},"related_user_id":{"bsonType":"string","description":"关联的另一位用户 _id"},"can_view_study":{"bsonType":"bool","description":"是否可以查看对方学习记录"},"created_at":{"bsonType":"date","description":"关联创建时间"}}}
