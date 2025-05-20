@@ -1,7 +1,7 @@
 {
   "globalStyle": {
     "navigationStyle": "default",
-    "navigationBarTitleText": "unibest",
+    "navigationBarTitleText": "LifaBox",
     "navigationBarBackgroundColor": "#f8f8f8",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FFFFFF"
@@ -50,6 +50,14 @@
       }
     },
     {
+      "path": "pages/courses/add",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "新增课程"
+      }
+    },
+    {
       "path": "pages/items/add",
       "type": "page",
       "layout": "default",
@@ -67,11 +75,7 @@
     },
     {
       "path": "pages/learn/index",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "学习"
-      }
+      "type": "page"
     },
     {
       "path": "pages/profile/index",

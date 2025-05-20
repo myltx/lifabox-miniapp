@@ -1,5 +1,5 @@
 <template>
-  <view class="p-4 space-y-4">
+  <view class="p-4 space-y-4 bg-[#f7f7f7] h-[93vh]">
     <!-- 顶部 Banner -->
     <view
       class="bg-gradient-to-r from-purple-400 to-blue-500 text-white rounded-2xl p-4 shadow-md relative"

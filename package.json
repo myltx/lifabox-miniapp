@@ -2,22 +2,21 @@
   "name": "life-box",
   "type": "commonjs",
   "version": "2.6.3",
-  "description": "unibest - 最好的 uniapp 开发模板",
+  "description": "**LifaBox** 是一款基于 UniBest + UniApp + Vue3 开发的微信小程序，集「学习管理」「打卡记录」「物品管理」「到期提醒」等功能于一体，适合个人或情侣/好友共同使用，提升学习效率与生活管理质量。",
   "author": {
-    "name": "feige996",
-    "zhName": "菲鸽",
-    "email": "1020103647@qq.com",
-    "github": "https://github.com/feige996",
-    "gitee": "https://gitee.com/feige996"
+    "name": "mylt",
+    "zhName": "小马",
+    "email": "865147643@qq.com",
+    "github": "https://github.com/myltx"
   },
   "license": "MIT",
-  "repository": "https://github.com/feige996/unibest",
-  "repository-gitee": "https://gitee.com/feige996/unibest",
-  "repository-deprecated": "https://github.com/codercup/unibest",
+  "repository": "https://github.com/myltx/lifabox-miniapp",
+  "repository-gitee": "https://github.com/myltx/lifabox-miniapp",
+  "repository-deprecated": "https://github.com/myltx/lifabox-miniapp",
   "bugs": {
-    "url": "https://github.com/feige996/unibest/issues"
+    "url": "https://github.com/myltx/lifabox-miniapp/issues"
   },
-  "homepage": "https://feige996.github.io/unibest/",
+  "homepage": "https://github.com/myltx/lifabox-miniapp",
   "engines": {
     "node": ">=18",
     "pnpm": ">=7.30"
