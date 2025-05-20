@@ -46,6 +46,7 @@
                 v-model="formData.timeUnit"
                 :columns="timeUnits"
                 custom-class="custom-picker"
+                label-key="text"
                 use-default-slot
                 @change="updateDurationDays"
               >
@@ -57,17 +58,26 @@
           <!-- 显示实际天数 -->
           <view v-if="formData.duration_days > 0" class="text-sm text-green-600 mt-2 ml-2">
             📅 实际课程周期为：
-            <text class="font-bold">{{ formData.duration_days }}</text>
+            <text class="font-bold ml-10px">{{ formData.duration_days }}</text>
             天
           </view>
 
-          <wd-textarea
+          <!-- <wd-textarea
             v-model="formData.description"
             label="课程描述"
             placeholder="请输入课程描述"
             :maxlength="300"
             show-count
-          />
+          /> -->
+          <!-- 备注信息 -->
+          <wd-cell-group>
+            <wd-textarea
+              v-model="formData.description"
+              placeholder="添加备注信息（选填）"
+              :maxlength="200"
+              show-count
+            />
+          </wd-cell-group>
         </wd-cell-group>
       </view>
     </view>
@@ -88,7 +98,7 @@ const formData = ref({
   start_time: '',
   description: '',
   shelfLife: null, // 输入的数值
-  timeUnit: '', // 时间单位
+  timeUnit: 'day', // 时间单位
   duration_days: 0, // 自动计算得出
 })
 
@@ -103,7 +113,7 @@ const timeUnits = [
 // 获取单位中文文本
 const getTimeUnitText = (unit: string) => {
   const found = timeUnits.find((item) => item.value === unit)
-  return found?.text || '单位'
+  return found?.text || '天'
 }
 
 // 计算 duration_days
@@ -186,7 +196,7 @@ const onSubmit = async () => {
 
 <style scoped lang="scss">
 .page-container {
-  min-height: 100vh;
+  min-height: 80vh;
   padding-bottom: 120px;
   background: #f8fafc;
 }
