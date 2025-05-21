@@ -42,7 +42,11 @@
       "weixin": {
           "appid": "wx5d34b302f19c64c4",
           "appsecret": "fd4433e49fc9fff3c2e0bb2c07b6f5ca"
-      }
+      },
+	   "oauth": {
+	        "scopes": "snsapi_userinfo",
+	        "callback": "/pages/login/index"
+	      }
     }
   },
   "mp-alipay": {

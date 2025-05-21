@@ -47,6 +47,8 @@ const handleWeixinLogin = async () => {
     const code = loginRes.code
     //     console.log('微信登录返回的 code:', code)
     const result = await uniIdCo.loginByWeixin({ code }) // ✅ 云对象方式
+    const { errCode, type, newToken } = result
+    console.log('登录结果:', result)
     // 调用你封装的后端微信登录函数（如你发的那段模块）
     //     const result = await uniCloud.callFunction({
     //       name: 'uni-id-co', // 你实际部署的云函数名称
@@ -57,7 +59,7 @@ const handleWeixinLogin = async () => {
     //     })
 
     // 登录成功处理逻辑
-    if (result.result?.errCode === 0) {
+    if (errCode === 0) {
       uni.showToast({
         title: '登录成功 🎉',
         icon: 'none',
