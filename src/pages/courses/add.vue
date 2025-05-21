@@ -22,6 +22,14 @@
             align-right
           />
 
+          <wd-input
+            v-model="formData.teacherName"
+            label="教师名称"
+            placeholder="请输入教师名称"
+            clearable
+            align-right
+          />
+
           <wd-datetime-picker
             v-model="formData.start_time"
             label="开始时间"
@@ -38,27 +46,27 @@
             placeholder="请输入持续周数"
             align-right
           />
-
-          <wd-cell title="上课星期">
-            <view class="weekday-checkboxes">
-              <wd-checkbox-group v-model="formData.weekdays">
-                <wd-checkbox v-for="(label, index) in weekdayOptions" :key="index" :label="index">
-                  {{ label }}
-                </wd-checkbox>
-              </wd-checkbox-group>
-            </view>
-          </wd-cell>
-
+          <wd-select-picker
+            label="上课星期"
+            v-model="formData.weekdays"
+            align-right
+            :columns="weekdayOptions"
+          ></wd-select-picker>
+        </wd-cell-group>
+      </view>
+      <view class="form-section">
+        <view class="section-title">课程描述</view>
+        <wd-cell-group>
           <wd-textarea
             v-model="formData.description"
             label="课程描述"
+            align-right
             placeholder="请输入课程描述"
             :maxlength="300"
             show-count
           />
         </wd-cell-group>
       </view>
-
       <!-- 预览课程排期 -->
       <view class="form-section" v-if="schedulePreview.length">
         <view class="section-title">课程排期</view>
@@ -81,17 +89,50 @@
 import { ref, watch, computed } from 'vue'
 import dayjs from 'dayjs'
 
+const courses = uniCloud.importObject('courses', {
+  customUI: true,
+})
 // 表单数据
 const formData = ref({
-  name: '',
+  name: '测试课程',
+  teacherName: '测试',
   start_time: '',
-  description: '',
+  description: '描述',
   duration_weeks: null,
   weekdays: [], // e.g., [1, 3, 5]
 })
 
 // 星期选项
-const weekdayOptions = ['日', '一', '二', '三', '四', '五', '六']
+const weekdayOptions = [
+  {
+    value: '0',
+    label: '周日',
+  },
+  {
+    value: '1',
+    label: '周一',
+  },
+  {
+    value: '2',
+    label: '周二',
+  },
+  {
+    value: '3',
+    label: '周三',
+  },
+  {
+    value: '4',
+    label: '周四',
+  },
+  {
+    value: '5',
+    label: '周五',
+  },
+  {
+    value: '6',
+    label: '周六',
+  },
+]
 
 // 根据 start_time + duration_weeks + weekdays 自动生成 schedule
 const schedulePreview = computed(() => {
@@ -105,7 +146,7 @@ const schedulePreview = computed(() => {
   const result: string[] = []
   const start = dayjs(formData.value.start_time).startOf('day')
 
-  for (let i = 0; i < formData.value.duration_weeks; i++) {
+  for (let i = 0; i <= formData.value.duration_weeks; i++) {
     for (const weekday of formData.value.weekdays) {
       const day = start.add(i, 'week').day(Number(weekday))
       if (day.isAfter(start) || day.isSame(start)) {
@@ -143,14 +184,7 @@ const onSubmit = async () => {
   if (!validateForm()) return
 
   try {
-    await uniCloud
-      .database()
-      .collection('courses')
-      .add({
-        ...formData.value,
-        start_time: new Date(formData.value.start_time),
-        course_schedule: schedulePreview.value,
-      })
+    await courses.add(formData.value)
 
     uni.showToast({
       title: '保存成功',
