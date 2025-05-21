@@ -31,54 +31,42 @@
             align-right
           />
 
-          <!-- 新的课程周期：数值 + 单位 -->
           <wd-input
-            v-model.number="formData.shelfLife"
-            label="课程周期"
+            v-model.number="formData.duration_weeks"
+            label="课程时长"
             type="number"
-            placeholder="请输入周期数值"
+            placeholder="请输入持续周数"
             align-right
-            @input="updateDurationDays"
-          >
-            <template #suffix>
-              <wd-picker
-                ref="timeUnitPicker"
-                v-model="formData.timeUnit"
-                :columns="timeUnits"
-                custom-class="custom-picker"
-                label-key="text"
-                use-default-slot
-                @change="updateDurationDays"
-              >
-                <view class="time-unit-text">{{ getTimeUnitText(formData.timeUnit) }}</view>
-              </wd-picker>
-            </template>
-          </wd-input>
+          />
 
-          <!-- 显示实际天数 -->
-          <view v-if="formData.duration_days > 0" class="text-sm text-green-600 mt-2 ml-2">
-            📅 实际课程周期为：
-            <text class="font-bold ml-10px">{{ formData.duration_days }}</text>
-            天
-          </view>
+          <wd-cell title="上课星期">
+            <view class="weekday-checkboxes">
+              <wd-checkbox-group v-model="formData.weekdays">
+                <wd-checkbox v-for="(label, index) in weekdayOptions" :key="index" :label="index">
+                  {{ label }}
+                </wd-checkbox>
+              </wd-checkbox-group>
+            </view>
+          </wd-cell>
 
-          <!-- <wd-textarea
+          <wd-textarea
             v-model="formData.description"
             label="课程描述"
             placeholder="请输入课程描述"
             :maxlength="300"
             show-count
-          /> -->
-          <!-- 备注信息 -->
-          <wd-cell-group>
-            <wd-textarea
-              v-model="formData.description"
-              placeholder="添加备注信息（选填）"
-              :maxlength="200"
-              show-count
-            />
-          </wd-cell-group>
+          />
         </wd-cell-group>
+      </view>
+
+      <!-- 预览课程排期 -->
+      <view class="form-section" v-if="schedulePreview.length">
+        <view class="section-title">课程排期</view>
+        <view class="schedule-list">
+          <view class="schedule-item" v-for="(date, idx) in schedulePreview" :key="idx">
+            {{ idx + 1 }}. {{ date }}
+          </view>
+        </view>
       </view>
     </view>
 
@@ -90,58 +78,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
+import dayjs from 'dayjs'
 
 // 表单数据
 const formData = ref({
   name: '',
   start_time: '',
   description: '',
-  shelfLife: null, // 输入的数值
-  timeUnit: 'day', // 时间单位
-  duration_days: 0, // 自动计算得出
+  duration_weeks: null,
+  weekdays: [], // e.g., [1, 3, 5]
 })
 
-// 单位选项
-const timeUnits = [
-  { text: '天', value: 'day' },
-  { text: '周', value: 'week' },
-  { text: '月', value: 'month' },
-  { text: '年', value: 'year' },
-]
+// 星期选项
+const weekdayOptions = ['日', '一', '二', '三', '四', '五', '六']
 
-// 获取单位中文文本
-const getTimeUnitText = (unit: string) => {
-  const found = timeUnits.find((item) => item.value === unit)
-  return found?.text || '天'
-}
+// 根据 start_time + duration_weeks + weekdays 自动生成 schedule
+const schedulePreview = computed(() => {
+  if (
+    !formData.value.start_time ||
+    !formData.value.duration_weeks ||
+    !formData.value.weekdays.length
+  )
+    return []
 
-// 计算 duration_days
-const updateDurationDays = () => {
-  const value = formData.value.shelfLife
-  const unit = formData.value.timeUnit
+  const result: string[] = []
+  const start = dayjs(formData.value.start_time).startOf('day')
 
-  if (value && unit) {
-    switch (unit) {
-      case 'day':
-        formData.value.duration_days = value
-        break
-      case 'week':
-        formData.value.duration_days = value * 7
-        break
-      case 'month':
-        formData.value.duration_days = value * 30
-        break
-      case 'year':
-        formData.value.duration_days = value * 365
-        break
-      default:
-        formData.value.duration_days = 0
+  for (let i = 0; i < formData.value.duration_weeks; i++) {
+    for (const weekday of formData.value.weekdays) {
+      const day = start.add(i, 'week').day(Number(weekday))
+      if (day.isAfter(start) || day.isSame(start)) {
+        result.push(day.format('YYYY-MM-DD'))
+      }
     }
-  } else {
-    formData.value.duration_days = 0
   }
-}
+
+  return result.sort()
+})
 
 // 表单验证
 const validateForm = () => {
@@ -153,12 +127,12 @@ const validateForm = () => {
     uni.showToast({ title: '请选择开始时间', icon: 'none' })
     return false
   }
-  if (!formData.value.description) {
-    uni.showToast({ title: '请输入课程描述', icon: 'none' })
+  if (!formData.value.duration_weeks || formData.value.duration_weeks <= 0) {
+    uni.showToast({ title: '请输入有效的持续周数', icon: 'none' })
     return false
   }
-  if (!formData.value.duration_days || formData.value.duration_days <= 0) {
-    uni.showToast({ title: '请输入有效的课程周期', icon: 'none' })
+  if (!formData.value.weekdays.length) {
+    uni.showToast({ title: '请选择上课的星期', icon: 'none' })
     return false
   }
   return true
@@ -175,6 +149,7 @@ const onSubmit = async () => {
       .add({
         ...formData.value,
         start_time: new Date(formData.value.start_time),
+        course_schedule: schedulePreview.value,
       })
 
     uni.showToast({
@@ -196,7 +171,7 @@ const onSubmit = async () => {
 
 <style scoped lang="scss">
 .page-container {
-  min-height: 80vh;
+  min-height: 100vh;
   padding-bottom: 120px;
   background: #f8fafc;
 }
@@ -222,6 +197,20 @@ const onSubmit = async () => {
   border-left: 4px solid #0ea5e9;
 }
 
+.weekday-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.schedule-list {
+  padding-left: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #334155;
+}
+
 .footer {
   position: fixed;
   right: 0;
@@ -244,10 +233,5 @@ const onSubmit = async () => {
 :deep(.wd-button--primary) {
   background: #0ea5e9;
   border-color: #0ea5e9;
-}
-
-.time-unit-text {
-  padding: 0 4px;
-  color: #333;
 }
 </style>
