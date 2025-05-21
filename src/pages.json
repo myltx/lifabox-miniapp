@@ -78,6 +78,10 @@
       "type": "page"
     },
     {
+      "path": "pages/login/index",
+      "type": "page"
+    },
+    {
       "path": "pages/profile/index",
       "type": "page",
       "layout": "default",

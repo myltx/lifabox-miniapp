@@ -35,18 +35,26 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const uniIdCo = uniCloud.importObject('uni-id-co', {
+  errorOptions: {
+    type: 'toast',
+  },
+})
+
 const handleWeixinLogin = async () => {
   try {
     const loginRes = await uni.login() // 获取 code
     const code = loginRes.code
-
+    //     console.log('微信登录返回的 code:', code)
+    const result = await uniIdCo.loginByWeixin({ code }) // ✅ 云对象方式
     // 调用你封装的后端微信登录函数（如你发的那段模块）
-    const result = await uniCloud.callFunction({
-      name: 'login-by-weixin', // 你实际部署的云函数名称
-      data: {
-        code,
-      },
-    })
+    //     const result = await uniCloud.callFunction({
+    //       name: 'uni-id-co', // 你实际部署的云函数名称
+    //       data: {
+    //         action: 'loginByWeixin',
+    //         code,
+    //       },
+    //     })
 
     // 登录成功处理逻辑
     if (result.result?.errCode === 0) {
