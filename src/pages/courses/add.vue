@@ -96,40 +96,41 @@ const courses = uniCloud.importObject('courses', {
 const formData = ref({
   name: '测试课程',
   teacherName: '测试',
-  start_time: '',
+  start_time: 1420041600000,
   description: '描述',
-  duration_weeks: null,
-  weekdays: [], // e.g., [1, 3, 5]
+  duration_weeks: 2,
+  weekdays: [1, 2], // e.g., [1, 3, 5]
+  course_schedule: ['2015-01-05', '2015-01-06', '2015-01-12', '2015-01-13'],
 })
 
 // 星期选项
 const weekdayOptions = [
   {
-    value: '0',
+    value: 0,
     label: '周日',
   },
   {
-    value: '1',
+    value: 1,
     label: '周一',
   },
   {
-    value: '2',
+    value: 2,
     label: '周二',
   },
   {
-    value: '3',
+    value: 3,
     label: '周三',
   },
   {
-    value: '4',
+    value: 4,
     label: '周四',
   },
   {
-    value: '5',
+    value: 5,
     label: '周五',
   },
   {
-    value: '6',
+    value: 6,
     label: '周六',
   },
 ]
@@ -184,6 +185,7 @@ const onSubmit = async () => {
   if (!validateForm()) return
 
   try {
+    formData.value.course_schedule = schedulePreview.value
     await courses.add(formData.value)
 
     uni.showToast({
