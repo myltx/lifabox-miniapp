@@ -115,16 +115,51 @@ module.exports = {
     if (!userInfo.uid || !token) return { code: 401, message: '用户未登录' }
 
     const todayStr = formatDate(new Date())
+    const todayDate = new Date(todayStr) // 零点时间，用于 date 精准匹配
 
-    const res = await db
+    // 查询今天的课程实例
+    const courseInstancesRes = await db
       .collection('course_instances')
       .where({ user_id: userInfo.uid, course_date: todayStr })
       .orderBy('course_date', 'asc')
       .get()
+    const courseInstances = courseInstancesRes.data
 
-    return { code: 0, message: '查询成功', data: res.data }
+    if (courseInstances.length === 0) {
+      return { code: 0, message: '无今日课程', data: [] }
+    }
+
+    // 提取课程 ID 列表
+    const courseIds = courseInstances.map((item) => item.course_id)
+
+    // 查询是否打卡
+    const checkinRes = await db
+      .collection('learning_records')
+      .where({
+        user_id: userInfo.uid,
+        course_id: db.command.in(courseIds),
+        date: todayDate,
+      })
+      .get()
+
+    const checkedCourseIds = new Set(checkinRes.data.map((item) => item.course_id))
+
+    // 标记是否打卡
+    const dataWithCheckin = courseInstances.map((course) => ({
+      ...course,
+      progress: {
+        total: 1,
+        completed: checkedCourseIds.has(course.course_id) ? 1 : 0,
+      },
+      has_checked_in: checkedCourseIds.has(course.course_id),
+    }))
+
+    return {
+      code: 0,
+      message: '查询成功',
+      data: dataWithCheckin,
+    }
   },
-
   /**
    * 修改课程
    */

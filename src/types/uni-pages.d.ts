@@ -10,6 +10,7 @@ interface NavigateToOptions {
        "/pages/items/add" |
        "/pages/items/index" |
        "/pages/learn/index" |
+       "/pages/learn/situation" |
        "/pages/login/index" |
        "/pages/profile/index";
 }

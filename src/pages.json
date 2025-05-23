@@ -78,6 +78,10 @@
       "type": "page"
     },
     {
+      "path": "pages/learn/situation",
+      "type": "page"
+    },
+    {
       "path": "pages/login/index",
       "type": "page"
     },
