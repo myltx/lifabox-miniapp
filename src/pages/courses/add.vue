@@ -23,7 +23,7 @@
           />
 
           <wd-input
-            v-model="formData.teacherName"
+            v-model="formData.teacher_name"
             label="教师名称"
             placeholder="请输入教师名称"
             clearable
@@ -95,7 +95,7 @@ const courses = uniCloud.importObject('courses', {
 // 表单数据
 const formData = ref({
   name: '测试课程',
-  teacherName: '测试',
+  teacher_name: '测试',
   start_time: 1420041600000,
   description: '描述',
   duration_weeks: 2,

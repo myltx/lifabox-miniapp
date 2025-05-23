@@ -1,7 +1,14 @@
 {
   "name": "courses",
-  "dependencies": {},
+  "version": "1.1.20",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "myltx",
   "extensions": {
     "uni-cloud-jql": {}
+  },
+  "dependencies": {
+    "uni-id-common": "file:../../../src/uni_modules/uni-id-common/uniCloud/cloudfunctions/common/uni-id-common"
   }
 }

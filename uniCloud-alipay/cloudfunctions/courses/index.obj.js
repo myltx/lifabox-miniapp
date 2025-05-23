@@ -1,71 +1,83 @@
-// 云对象教程: https://uniapp.dcloud.net.cn/uniCloud/cloud-obj
-// jsdoc语法提示教程：https://ask.dcloud.net.cn/docs/#//ask.dcloud.net.cn/article/129
+'use strict'
 const uniID = require('uni-id-common')
 module.exports = {
-  _before: function () {
-    // 通用预处理器
+  /**
+   * 通用预处理器
+   */
+  _before: async function () {
     const clientInfo = this.getClientInfo()
-    this.uniID = uniID.createInstance({
-      // 创建uni-id实例，其上方法同uniID
-      clientInfo,
-    })
+    // 如果你启用了 uni-id 认证，可以在此处初始化
+    this.uniID = uniID.createInstance({ clientInfo })
   },
+
+  /**
+   * 新增课程
+   */
   add: async function (params = {}) {
     const db = uniCloud.database()
     const courseCollection = db.collection('courses')
 
+    // 获取用户 Token
     const token = this.getUniIdToken()
-    console.log(token, 'token')
+    const userInfo = await this.uniID.checkToken(token)
+    console.log(userInfo, 'token')
 
-    const userInfo = await uniID.checkToken(token)
-    console.log(userInfo, 'userInfo')
-    const uid = this.authInfo.uid
-    if (!uid) throw new Error('用户未登录')
-
-    const schema = {
-      name: 'string',
-      teacher_name: {
-        type: 'string',
-        required: false,
-      },
-      description: 'string',
-      start_time: 'date',
-      duration_days: 'number',
-      weekdays: {
-        type: 'array',
-        items: {
-          type: 'number',
-        },
-      },
+    if (!userInfo.uid || !token) {
+      return {
+        code: 401,
+        message: '用户未登录，请先登录',
+      }
     }
+    console.log(params, 'params')
+    const {
+      name,
+      teacher_name = '',
+      description,
+      start_time,
+      duration_weeks,
+      weekdays = [],
+    } = params
 
-    this.middleware.validate(params, schema)
-
-    const { name, teacher_name = '', description, start_time, duration_days, weekdays } = params
-
-    const startDate = new Date(start_time)
-    const schedule = []
-
-    for (let i = 0; i < duration_days; i++) {
-      const currentDate = new Date(startDate)
-      currentDate.setDate(startDate.getDate() + i)
-      const dayOfWeek = currentDate.getDay()
-      if (weekdays.includes(dayOfWeek)) {
-        schedule.push(formatDate(currentDate))
+    if (!name || !description || !start_time || !duration_weeks || weekdays.length === 0) {
+      return {
+        code: 400,
+        message: '请填写完整的课程信息',
       }
     }
 
+    const startDate = new Date(start_time)
     const now = new Date()
 
+    // 计算课程排期
+    const schedule = []
+    for (let week = 0; week < duration_weeks; week++) {
+      for (let i = 0; i < weekdays.length; i++) {
+        const weekday = weekdays[i]
+        const courseDate = new Date(startDate)
+        const startDay = startDate.getDay()
+
+        const daysOffset = 7 * week + (weekday - startDay)
+        courseDate.setDate(startDate.getDate() + daysOffset)
+
+        // 如果课程开始后才开始添加
+        if (courseDate >= startDate) {
+          schedule.push(formatDate(courseDate))
+        }
+      }
+    }
+
+    // 去重 + 排序
+    const course_schedule = [...new Set(schedule)].sort()
+
     const insertResult = await courseCollection.add({
-      user_id: uid,
+      user_id: userInfo.uid,
       name,
       teacher_name,
       description,
       start_time: startDate,
-      duration_days,
+      duration_weeks,
       weekdays,
-      course_schedule: schedule,
+      course_schedule,
       created_at: now,
       updated_at: now,
     })
@@ -80,6 +92,11 @@ module.exports = {
   },
 }
 
+/**
+ * 日期格式化函数
+ * @param {Date} date
+ * @returns {string} YYYY-MM-DD 格式字符串
+ */
 function formatDate(date) {
   const yyyy = date.getFullYear()
   const mm = String(date.getMonth() + 1).padStart(2, '0')
