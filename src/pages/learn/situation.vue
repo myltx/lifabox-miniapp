@@ -28,7 +28,7 @@
       <view class="text-sm text-gray-500 mb-2">最近 30 天打卡</view>
       <!-- <canvas canvas-id="barChart" id="barChart" class="w-full h-40" /> -->
       <view class="charts-box" id="barChart">
-        <qiun-data-charts type="column" :chartData="chartData" />
+        <qiun-data-charts type="column" :opts="opts" :chartData="chartData" />
       </view>
     </view>
 
@@ -58,17 +58,7 @@ const latestCheckin = ref('')
 const calendarData = ref([])
 
 const opts = {
-  color: [
-    '#1890FF',
-    '#91CB74',
-    '#FAC858',
-    '#EE6666',
-    '#73C0DE',
-    '#3CA272',
-    '#FC8452',
-    '#9A60B4',
-    '#ea7ccc',
-  ],
+  color: ['#575dea'],
   padding: [15, 15, 0, 5],
   enableScroll: false,
   legend: {},
@@ -85,22 +75,21 @@ const opts = {
   extra: {
     column: {
       type: 'group',
-      width: 30,
+      width: 20,
+      customColor: ['#575dea', '#575dea'],
       activeBgColor: '#000000',
       activeBgOpacity: 0.08,
+      linearType: 'custom',
     },
   },
 }
 const chartData = ref({
+  color: ['#575dea'],
   categories: ['2018', '2019', '2020', '2021', '2022', '2023'],
   series: [
     {
       name: '目标值',
       data: [35, 36, 31, 33, 13, 34],
-    },
-    {
-      name: '完成量',
-      data: [18, 27, 21, 24, 6, 28],
     },
   ],
 })
