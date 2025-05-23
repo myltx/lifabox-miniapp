@@ -1,103 +1,151 @@
 <template>
   <view class="p-4 space-y-4 bg-[#f7f7f7] h-[93vh]">
-    <!-- 顶部 Banner -->
+    <!-- 标题 Banner -->
     <view
-      class="bg-gradient-to-r from-purple-400 to-blue-500 text-white rounded-2xl p-4 shadow-md relative"
+      class="bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-2xl p-4 shadow-md"
     >
-      <view class="text-sm opacity-80 absolute top-2 left-4">📅 {{ today }}</view>
-      <view class="text-xl font-bold text-center mt-6">LifaBox 生活助手</view>
+      <view class="text-sm opacity-80">📊 学习情况一览</view>
+      <view class="text-xl font-bold mt-2 text-center">学习记录统计</view>
     </view>
 
-    <!-- 信息卡片区域 -->
+    <!-- 数据卡片区域 -->
     <view class="flex gap-3">
-      <!-- 学习次数卡片 -->
-      <view class="flex-1 p-3 rounded-xl bg-white shadow" @click="goToLearnPage">
-        <view class="text-sm text-gray-500">学习次数</view>
-        <view class="text-lg font-bold text-indigo-600">{{ studyCount }}</view>
-        <button
-          class="btn mt-2 text-xs bg-indigo-100 text-indigo-600 rounded-full px-3 py-1"
-          @click.stop="handleLearn"
-        >
-          学习情况
-        </button>
-      </view>
-
-      <!-- 物品总数卡片 -->
+      <!-- 累计打卡 -->
       <view class="flex-1 p-3 rounded-xl bg-white shadow">
-        <view class="text-sm text-gray-500">物品总数</view>
-        <view class="text-lg font-bold text-purple-600">{{ itemTotal }}</view>
-        <button
-          class="btn mt-2 text-xs bg-purple-100 text-purple-700 rounded-full px-3 py-1"
-          @click="viewItems"
-        >
-          查看物品
-        </button>
+        <view class="text-sm text-gray-500">累计打卡</view>
+        <view class="text-lg font-bold text-indigo-600">{{ totalCount }}</view>
+      </view>
+
+      <!-- 最近打卡日期 -->
+      <view class="flex-1 p-3 rounded-xl bg-white shadow">
+        <view class="text-sm text-gray-500">最近打卡</view>
+        <view class="text-lg font-bold text-indigo-600">{{ latestCheckin || '无记录' }}</view>
       </view>
     </view>
 
-    <!-- 学习打卡按钮 -->
-    <!-- <view class="flex justify-center">
-      <button class="bg-indigo-500 text-white px-4 py-2 rounded-full shadow" @tap="handleCheckIn">
-        学习打卡
-      </button>
-    </view> -->
+    <!-- 柱状图区域 -->
+    <view class="bg-white p-3 rounded-xl shadow">
+      <view class="text-sm text-gray-500 mb-2">最近 30 天打卡</view>
+      <!-- <canvas canvas-id="barChart" id="barChart" class="w-full h-40" /> -->
+      <view class="charts-box" id="barChart">
+        <qiun-data-charts type="column" :chartData="chartData" />
+      </view>
+    </view>
 
-    <!-- 即将过期物品 -->
-    <view class="bg-white p-4 rounded-xl shadow">
-      <view class="font-bold text-md mb-2">即将过期物品</view>
-      <view
-        v-for="item in expiringItems"
-        :key="item.name"
-        class="flex justify-between items-center py-1"
+    <!-- 操作按钮 -->
+    <view class="flex justify-center gap-4 mt-2">
+      <button
+        class="bg-white border border-indigo-200 text-indigo-600 rounded-full px-4 py-1 text-sm shadow"
+        @tap="goBack"
       >
-        <text>{{ item.name }}</text>
-        <text class="text-red-500">{{ item.date }}</text>
-      </view>
+        返回主页
+      </button>
+      <button
+        class="bg-indigo-500 text-white rounded-full px-4 py-1 text-sm shadow"
+        @tap="goToLearn"
+      >
+        去学习
+      </button>
     </view>
-    <!-- 庆祝动画组件 -->
-    <CelebrationAnimation :show="showCelebration" />
   </view>
 </template>
-
 <script setup lang="ts">
-import { ref } from 'vue'
-import CelebrationAnimation from '@/components/CelebrationAnimation/index.vue'
+import { ref, onMounted, nextTick } from 'vue'
 
-const courseCheckin = uniCloud.importObject('course-checkin', {
-  customUI: true,
+// import * as echarts from '@/utils/echarts' // 自行封装或者引入 echarts 支持
+const totalCount = ref(0)
+const latestCheckin = ref('')
+const calendarData = ref([])
+
+const opts = {
+  color: [
+    '#1890FF',
+    '#91CB74',
+    '#FAC858',
+    '#EE6666',
+    '#73C0DE',
+    '#3CA272',
+    '#FC8452',
+    '#9A60B4',
+    '#ea7ccc',
+  ],
+  padding: [15, 15, 0, 5],
+  enableScroll: false,
+  legend: {},
+  xAxis: {
+    disableGrid: true,
+  },
+  yAxis: {
+    data: [
+      {
+        min: 0,
+      },
+    ],
+  },
+  extra: {
+    column: {
+      type: 'group',
+      width: 30,
+      activeBgColor: '#000000',
+      activeBgOpacity: 0.08,
+    },
+  },
+}
+const chartData = ref({
+  categories: ['2018', '2019', '2020', '2021', '2022', '2023'],
+  series: [
+    {
+      name: '目标值',
+      data: [35, 36, 31, 33, 13, 34],
+    },
+    {
+      name: '完成量',
+      data: [18, 27, 21, 24, 6, 28],
+    },
+  ],
 })
-const showCelebration = ref(false)
-const today = new Date().toISOString().split('T')[0]
-const studyCount = ref(0)
-const itemTotal = ref(38)
-const expiringItems = ref([
-  { name: '牛奶', date: '2025-05-15' },
-  { name: '鸡蛋', date: '2025-05-17' },
-])
 
-const getData = async () => {
-  const res = await courseCheckin.getTotalCheckinCount()
-  console.log('学习打卡次数:', res)
-  studyCount.value = res?.data?.totalCheckinCount || 0
-}
+onMounted(async () => {
+  const res = await uniCloud
+    .importObject('course-checkin', { customUI: true })
+    .getCalendarCheckinData()
+  const data = res?.data || []
 
-getData()
+  calendarData.value = data
+  totalCount.value = data.reduce((sum, item) => sum + item.count, 0)
+  latestCheckin.value = data.filter((i) => i.count > 0).slice(-1)[0]?.date || ''
 
-const goToLearnPage = () => {
-  uni.navigateTo({ url: '/pages/learn/index' })
-}
+  await nextTick()
+  // initChart(data)
+})
 
-const viewItems = () => {
-  uni.navigateTo({ url: '/pages/items/index' }) // 假设这是你的物品页路径
-}
+// function initChart(data) {
+//   const chart = echarts.init(document.getElementById('barChart'))
+//   chart.setOption({
+//     tooltip: { trigger: 'axis' },
+//     xAxis: {
+//       type: 'category',
+//       data: data.map((d) => d.date.slice(5)), // 显示 MM-DD
+//       axisLabel: { rotate: 45 },
+//     },
+//     yAxis: { type: 'value' },
+//     series: [
+//       {
+//         data: data.map((d) => d.count),
+//         type: 'bar',
+//         itemStyle: { color: '#6366F1' },
+//       },
+//     ],
+//   })
+// }
 
-const handleLearn = () => {
-  uni.navigateTo({ url: '/pages/learn/situation' })
-}
+const goBack = () => uni.navigateBack()
+const goToLearn = () => uni.navigateTo({ url: '/pages/learn/index' })
 </script>
 
 <style scoped>
-.btn:active {
-  opacity: 0.8;
+.charts-box {
+  width: 100%;
+  height: 300px;
 }
 </style>

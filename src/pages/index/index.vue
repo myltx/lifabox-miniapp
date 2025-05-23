@@ -81,7 +81,10 @@ const getData = async () => {
   studyCount.value = res?.data?.totalCheckinCount || 0
 }
 
-getData()
+onShow(() => {
+  // 页面显示时获取数据
+  getData()
+})
 
 const goToLearnPage = () => {
   uni.navigateTo({ url: '/pages/learn/index' })

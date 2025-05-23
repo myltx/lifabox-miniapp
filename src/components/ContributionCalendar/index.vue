@@ -17,7 +17,22 @@
 <script setup lang="ts">
 import { getCalendarData } from '@/composables/useContributionData'
 
-const calendar = getCalendarData()
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => [],
+  },
+})
+
+const calendar = ref<any>(getCalendarData())
+
+watchEffect(() => {
+  if (props.data.length) {
+    calendar.value = props.data
+  } else {
+    calendar.value = getCalendarData()
+  }
+})
 
 function getColor(count: number) {
   if (count === 0) return '#E5E7EB' // gray-200
@@ -52,9 +67,9 @@ function getColor(count: number) {
 }
 
 .day-cell {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
+  width: 1.5vw;
+  height: 1.5vw;
+  border-radius: 0.3vw;
 }
 .calendar-footer {
   margin-top: 10px;

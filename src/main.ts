@@ -7,6 +7,8 @@ import App from './App.vue'
 import { prototypeInterceptor, requestInterceptor, routeInterceptor } from './interceptors'
 import store from './store'
 
+import qiunDataCharts from '@/components/qiun-data-charts/qiun-data-charts.vue'
+
 export function createApp() {
   const app = createSSRApp(App)
   app.use(store)
@@ -14,6 +16,7 @@ export function createApp() {
   app.use(requestInterceptor)
   app.use(prototypeInterceptor)
   app.use(VueQueryPlugin)
+  app.component('qiun-data-charts', qiunDataCharts)
 
   return {
     app,

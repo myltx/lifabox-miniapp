@@ -165,6 +165,62 @@ module.exports = {
       },
     }
   },
+  /**
+   * 获取过去一年日历热力图数据 获取过去一年每日打卡次数
+   */
+
+  getCalendarCheckinData: async function () {
+    const db = uniCloud.database()
+    const token = this.getUniIdToken()
+    const userInfo = await this.uniID.checkToken(token)
+    if (!userInfo.uid) return { code: 401, message: '请登录后操作' }
+
+    const today = new Date()
+    const startDate = new Date()
+    startDate.setDate(today.getDate() - 52 * 7)
+    startDate.setHours(0, 0, 0, 0)
+
+    const fromDate = new Date(startDate)
+    fromDate.setDate(fromDate.getDate() - fromDate.getDay()) // 补齐到周日开始
+
+    const res = await db
+      .collection('learning_records')
+      .where({
+        user_id: userInfo.uid,
+        date: db.command.gte(fromDate),
+      })
+      .get()
+
+    // 统计每天的 count
+    const countMap = {}
+    res.data.forEach((item) => {
+      const key = formatDate(item.date)
+      countMap[key] = (countMap[key] || 0) + 1
+    })
+
+    // 构造 DayData[][] 结构
+    const weeks = []
+    const cursor = new Date(fromDate)
+
+    for (let w = 0; w < 53; w++) {
+      const week = []
+      for (let d = 0; d < 7; d++) {
+        const key = formatDate(cursor)
+        week.push({
+          date: key,
+          count: countMap[key] || 0,
+        })
+        cursor.setDate(cursor.getDate() + 1)
+      }
+      weeks.push(week)
+    }
+
+    return {
+      code: 0,
+      message: '获取成功',
+      data: weeks,
+    }
+  },
 }
 
 /**
