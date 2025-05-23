@@ -221,6 +221,83 @@ module.exports = {
       data: weeks,
     }
   },
+
+  /**
+   * 获取近七天用户所有课程的打卡数量
+   */
+  /**
+   * 获取指定时间范围内的打卡记录（默认近 7 天）
+   */
+  /**
+   * 获取指定时间范围内每天的打卡次数（可用于折线图等展示）
+   */
+  getDailyCheckinCounts: async function (params = {}) {
+    const db = uniCloud.database()
+    const token = this.getUniIdToken()
+    const userInfo = await this.uniID.checkToken(token)
+    if (!userInfo.uid || !token) {
+      return { code: 401, message: '用户未登录' }
+    }
+
+    const { start_date = '', end_date = '' } = params
+    const today = new Date()
+    const defaultEnd = new Date(formatDate(today))
+    const defaultStart = new Date(defaultEnd)
+    defaultStart.setDate(defaultEnd.getDate() - 6)
+
+    const startDate = start_date ? new Date(start_date) : defaultStart
+    const endDate = end_date ? new Date(end_date) : defaultEnd
+    endDate.setHours(23, 59, 59, 999)
+
+    const res = await db
+      .collection('learning_records')
+      .aggregate()
+      .match({
+        user_id: userInfo.uid,
+        date: db.command.gte(startDate).lte(endDate),
+      })
+      .group({
+        _id: '$date',
+        count: db.command.aggregate.sum(1),
+      })
+      .sort({
+        _id: 1, // 按日期升序排列
+      })
+      .end()
+
+    return {
+      code: 0,
+      message: '查询成功',
+      data: res.data.map((item) => ({
+        date: formatDate(item._id),
+        count: item.count,
+      })),
+    }
+  },
+  /**
+   * 获取用户最新的一条打卡记录
+   * */
+  getLatestCheckin: async function () {
+    const db = uniCloud.database()
+    const token = this.getUniIdToken()
+    const userInfo = await this.uniID.checkToken(token)
+    if (!userInfo.uid) return { code: 401, message: '请登录后操作' }
+
+    const res = await db
+      .collection('learning_records')
+      .where({
+        user_id: userInfo.uid,
+      })
+      .orderBy('date', 'desc')
+      .limit(1)
+      .get()
+
+    return {
+      code: 0,
+      message: '获取成功',
+      data: res.data[0] || null,
+    }
+  },
 }
 
 /**

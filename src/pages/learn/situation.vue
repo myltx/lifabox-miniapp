@@ -50,9 +50,13 @@
   </view>
 </template>
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { ref, onMounted, nextTick } from 'vue'
 
-// import * as echarts from '@/utils/echarts' // 自行封装或者引入 echarts 支持
+const courseCheckin = uniCloud.importObject('course-checkin', {
+  customUI: true,
+})
+
 const totalCount = ref(0)
 const latestCheckin = ref('')
 const calendarData = ref([])
@@ -85,13 +89,50 @@ const opts = {
 }
 const chartData = ref({
   color: ['#575dea'],
-  categories: ['2018', '2019', '2020', '2021', '2022', '2023'],
+  categories: [],
   series: [
     {
-      name: '目标值',
-      data: [35, 36, 31, 33, 13, 34],
+      name: '最近七天打卡1',
+      data: [],
     },
   ],
+})
+
+const getData = async () => {
+  const res = await courseCheckin.getTotalCheckinCount()
+  totalCount.value = res?.data?.totalCheckinCount || 0
+
+  const data = await courseCheckin.getLatestCheckin()
+  console.log(data, 'data')
+  if (data.data) {
+    latestCheckin.value = dayjs(data.data.created_at).format('YYYY-MM-DD')
+  } else {
+    latestCheckin.value = '无记录'
+  }
+}
+
+onShow(async () => {
+  const data = await courseCheckin.getDailyCheckinCounts(
+    dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
+    dayjs().format('YYYY-MM-DD'),
+  )
+  chartData.value = {
+    color: ['#575dea'],
+    categories:
+      data?.data.map((item) => {
+        return dayjs(item.date).format('YYYY-MM-DD')
+      }) || [],
+    series: [
+      {
+        name: '最近七天打卡',
+        data:
+          data?.data.map((item) => {
+            return item.count
+          }) || [],
+      },
+    ],
+  }
+  getData()
 })
 
 onMounted(async () => {
