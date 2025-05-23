@@ -43,10 +43,11 @@
       "type": "home"
     },
     {
-      "path": "pages/about/about",
+      "path": "pages/about/index",
       "type": "page",
+      "layout": "default",
       "style": {
-        "navigationBarTitleText": "关于"
+        "navigationBarTitleText": "关于我们"
       }
     },
     {
@@ -55,6 +56,38 @@
       "layout": "default",
       "style": {
         "navigationBarTitleText": "新增课程"
+      }
+    },
+    {
+      "path": "pages/courses/detail",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "课程详情"
+      }
+    },
+    {
+      "path": "pages/courses/index",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "课程列表"
+      }
+    },
+    {
+      "path": "pages/item-categories/edit",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "新增分类"
+      }
+    },
+    {
+      "path": "pages/item-categories/index",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "物品分类"
       }
     },
     {

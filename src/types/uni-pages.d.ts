@@ -5,8 +5,12 @@
 
 interface NavigateToOptions {
   url: "/pages/index/index" |
-       "/pages/about/about" |
+       "/pages/about/index" |
        "/pages/courses/add" |
+       "/pages/courses/detail" |
+       "/pages/courses/index" |
+       "/pages/item-categories/edit" |
+       "/pages/item-categories/index" |
        "/pages/items/add" |
        "/pages/items/index" |
        "/pages/learn/index" |

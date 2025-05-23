@@ -6,6 +6,7 @@
   },
 }
 </route>
+
 <template>
   <view class="p-4 space-y-4 bg-gray-100 min-h-screen">
     <!-- 用户信息区域 -->
@@ -45,24 +46,37 @@
 <script setup lang="ts">
 import { useToast } from 'wot-design-uni'
 const toast = useToast()
+
 const menuList = [
+  {
+    title: '我的课程',
+    icon: '📘',
+    color: 'text-indigo-500',
+    path: '/pages/courses/index',
+  },
+  {
+    title: '我的物品分类', // ✅ 新增入口
+    icon: '📦',
+    color: 'text-yellow-500',
+    path: '/pages/item-categories/index',
+  },
   {
     title: '我的收藏',
     icon: '❤️',
     color: 'text-pink-500',
-    path: '/pages/favorites/index',
+    // path: '/pages/favorites/index',
   },
   {
     title: '设置',
     icon: '⚙️',
     color: 'text-blue-500',
-    path: '/pages/settings/index',
+    // path: '/pages/settings/index',
   },
   {
     title: '意见反馈',
     icon: '📝',
     color: 'text-green-500',
-    path: '/pages/feedback/index',
+    // path: '/pages/feedback/index',
   },
   {
     title: '关于我们',
@@ -73,9 +87,11 @@ const menuList = [
 ]
 
 function goTo(path: string) {
-  toast.show('功能开发中,敬请期待')
-  //   uni.navigateTo({ url: path })
+  // ❗️开发中提示，实际功能完成后可放开跳转
+  if (!path) {
+    toast.show('功能开发中,敬请期待')
+    return
+  }
+  uni.navigateTo({ url: path })
 }
 </script>
-
-<style scoped></style>
