@@ -17,6 +17,7 @@ module.exports = {
       category_id = '',
       description = '',
       image = '',
+      production_date,
       expiry_date = '',
       remind_days_before = 0,
     } = params
@@ -28,6 +29,7 @@ module.exports = {
     const res = await db.collection('items').add({
       user_id: uid,
       category_id,
+      production_date,
       name,
       description,
       image,

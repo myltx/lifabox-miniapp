@@ -41,7 +41,6 @@ const categories = ref<any>([])
 
 onShow(async () => {
   const data = await itemCategories.list({})
-  console.log(data, 'data')
   categories.value = data.data || []
 })
 

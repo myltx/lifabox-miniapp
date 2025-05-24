@@ -24,14 +24,17 @@
 
           <wd-select-picker
             label="物品分类"
-            v-model="formData.categoryId"
+            v-model="formData.category_id"
             :columns="categories"
+            :type="'radio'"
+            :value-key="'_id'"
+            :label-key="'name'"
             align-right
           ></wd-select-picker>
 
           <!-- 生产日期 -->
           <wd-datetime-picker
-            v-model="formData.productionDate"
+            v-model="formData.production_date"
             label="生产日期"
             type="date"
             value-format="YYYY-MM-DD"
@@ -96,11 +99,18 @@
 import { ref, computed, watch } from 'vue'
 import dayjs from 'dayjs'
 
+const items = uniCloud.importObject('items', {
+  customUI: true,
+})
+const itemCategories = uniCloud.importObject('itemCategories', {
+  customUI: true,
+})
+
 // 表单数据
 const formData = ref({
   name: '',
-  categoryId: '',
-  productionDate: '',
+  category_id: '',
+  production_date: '',
   shelfLife: '',
   timeUnit: 'day',
   expireDate: '',
@@ -112,16 +122,25 @@ const timeUnitPicker = ref(null)
 const showCategoryPicker = ref(false)
 
 // 分类列表
-const categories = [
-  { id: 1, name: '食品' },
-  { id: 2, name: '日用品' },
-  { id: 3, name: '电子产品' },
-  { id: 4, name: '其他' },
-]
+const categories = ref([])
+
+const getData = async () => {
+  const categoriesData = await itemCategories.list({})
+  console.log('获取物品分类数据:', categoriesData)
+  categories.value =
+    categoriesData.data?.map((item) => {
+      item.name = `${item.icon} ${item.name}`
+      return item
+    }) || []
+}
+
+onShow(async () => {
+  getData()
+})
 
 // 当前选中的分类名称
 const categoryName = computed(() => {
-  const category = categories.find((item) => item.id === formData.value.categoryId)
+  const category = categories.value.find((item) => item.id === formData.value.category_id)
   return category ? category.name : '请选择'
 })
 
@@ -147,7 +166,7 @@ const getTimeUnitText = (value: string) => {
 // 监听生产日期和保质期变化，自动计算过期日期
 watch(
   [
-    () => formData.value.productionDate,
+    () => formData.value.production_date,
     () => formData.value.shelfLife,
     () => formData.value.timeUnit,
   ],
@@ -202,11 +221,11 @@ const validateForm = () => {
     uni.showToast({ title: '请输入物品名称', icon: 'none' })
     return false
   }
-  if (!formData.value.categoryId) {
+  if (!formData.value.category_id) {
     uni.showToast({ title: '请选择物品分类', icon: 'none' })
     return false
   }
-  if (!formData.value.productionDate) {
+  if (!formData.value.production_date) {
     uni.showToast({ title: '请选择生产日期', icon: 'none' })
     return false
   }
@@ -218,22 +237,36 @@ const validateForm = () => {
 }
 
 // 表单提交
-const onSubmit = () => {
+const onSubmit = async () => {
   if (!validateForm()) return
 
   // TODO: 调用保存接口
   console.log('提交表单:', formData.value)
 
-  uni.showToast({
-    title: '保存成功',
-    icon: 'success',
-    duration: 2000,
-    success: () => {
-      setTimeout(() => {
-        uni.navigateBack()
-      }, 2000)
-    },
-  })
+  const submitData = JSON.parse(JSON.stringify(formData.value))
+  submitData.production_date = dayjs(submitData.production_date).format('YYYY-MM-DD')
+  submitData.expiry_date = dayjs(submitData.expireDate).format('YYYY-MM-DD')
+
+  try {
+    await items.add(submitData)
+
+    uni.showToast({
+      title: '保存成功',
+      icon: 'success',
+      duration: 2000,
+      success: () => {
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 2000)
+      },
+    })
+  } catch (error) {
+    console.error('保存失败:', error)
+    uni.showToast({
+      title: '保存失败，请稍后重试',
+      icon: 'none',
+    })
+  }
 }
 const showTimeUnitPicker = () => {
   timeUnitPicker.value.open()

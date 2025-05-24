@@ -20,32 +20,27 @@
         <wd-tab :title="category.name">
           <!-- 当前分类下的物品列表 -->
           <view class="items-container">
-            <view
-              v-for="item in filteredItems(category.id)"
-              :key="item.id"
-              class="item-card"
-              @click="onItemClick(item)"
-            >
+            <view v-for="item in items" :key="item.id" class="item-card" @click="onItemClick(item)">
               <view class="item-content">
                 <view class="item-left">
                   <text class="item-name">{{ item.name }}</text>
                   <view class="item-info">
                     <text class="expire-date">
                       <text class="icon">📅</text>
-                      {{ formatDate(item.expireDate) }}
+                      {{ item.expiry_date }}
                     </text>
-                    <text class="remaining-days" :class="getDaysClass(item.expireDate)">
-                      {{ getRemainingDays(item.expireDate) }}
+                    <text class="remaining-days" :class="getDaysClass(item.expiry_date)">
+                      {{ getRemainingDays(item.expiry_date) }}
                     </text>
                   </view>
                 </view>
                 <view class="item-right">
                   <view
                     class="expire-tag"
-                    :class="getExpireTagClass(item.expireDate)"
-                    v-if="isExpiringSoon(item.expireDate)"
+                    :class="getExpireTagClass(item.expiry_date)"
+                    v-if="isExpiringSoon(item.expiry_date)"
                   >
-                    {{ getExpireStatus(item.expireDate) }}
+                    {{ getExpireStatus(item.expiry_date) }}
                   </view>
                 </view>
               </view>
@@ -69,27 +64,42 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
+const itemCategories = uniCloud.importObject('itemCategories', {
+  customUI: true,
+})
+
+const itemsApi = uniCloud.importObject('items', {
+  customUI: true,
+})
+
 // 当前选中的分类标签 index
 const selectedTab = ref(0)
 
 // 分类列表（可扩展从数据库读取）
-const categories = ref([
-  { id: 1, name: '食品' },
-  { id: 2, name: '日用品' },
-  { id: 3, name: '电子产品' },
-  { id: 4, name: '其他' },
-])
+const categories = ref([])
 
 // 物品数据示例
-const items = ref([
-  { id: 1, name: '牛奶', expireDate: '2025-05-17', categoryId: 1 },
-  { id: 2, name: '洗发水', expireDate: '2025-06-05', categoryId: 2 },
-  { id: 3, name: '耳机', expireDate: '2026-01-01', categoryId: 3 },
-  { id: 4, name: '饼干', expireDate: '2025-05-16', categoryId: 1 },
-])
+const items = ref([])
 
 // 计算总物品数
 const totalItems = computed(() => items.value.length)
+
+const getData = async () => {
+  const categoriesData = await itemCategories.list({})
+  categories.value =
+    categoriesData.data?.map((item) => {
+      item.name = `${item.icon} ${item.name}`
+      return item
+    }) || []
+
+  const itemsData = await itemsApi.list({})
+  items.value = itemsData.data?.list || []
+  console.log('获取物品数据:', items.value)
+}
+
+onShow(async () => {
+  getData()
+})
 
 // 过滤指定分类下的物品
 const filteredItems = (categoryId: number) => {
@@ -112,6 +122,7 @@ const formatDate = (date: string) => {
 // 获取剩余天数
 const getRemainingDays = (expireDate: string) => {
   const today = new Date()
+  console.log(expireDate, 'expireDate')
   const expire = new Date(expireDate)
   const diffDays = Math.ceil((expire.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
   if (diffDays < 0) return '已过期'
