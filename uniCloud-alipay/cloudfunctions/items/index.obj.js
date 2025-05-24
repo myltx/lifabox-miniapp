@@ -49,12 +49,7 @@ module.exports = {
     const token = this.getUniIdToken()
     const { uid } = await this.uniID.checkToken(token)
 
-    const {
-      category_id = '',
-      keyword = '',
-      page = 1,
-      pageSize = 20,
-    } = params
+    const { category_id = '', keyword = '', page = 1, pageSize = 20 } = params
 
     const db = uniCloud.database()
     const dbCmd = db.command
@@ -91,19 +86,24 @@ module.exports = {
     const { id, ...updates } = params
     if (!id) throw new Error('缺少物品 ID')
 
-    const allowedFields = ['name', 'category_id', 'description', 'image', 'expiry_date', 'remind_days_before']
+    const allowedFields = [
+      'name',
+      'category_id',
+      'description',
+      'image',
+      'expiry_date',
+      'remind_days_before',
+    ]
     const updateData = { updated_at: new Date() }
 
-    allowedFields.forEach(field => {
+    allowedFields.forEach((field) => {
       if (field in updates) {
         updateData[field] = updates[field]
       }
     })
 
     const db = uniCloud.database()
-    const res = await db.collection('items')
-      .where({ _id: id, user_id: uid })
-      .update(updateData)
+    const res = await db.collection('items').where({ _id: id, user_id: uid }).update(updateData)
 
     return {
       code: 0,
@@ -120,13 +120,11 @@ module.exports = {
     if (!id) throw new Error('缺少物品 ID')
 
     const db = uniCloud.database()
-    const res = await db.collection('items')
-      .where({ _id: id, user_id: uid })
-      .remove()
+    const res = await db.collection('items').where({ _id: id, user_id: uid }).remove()
 
     return {
       code: 0,
       message: res.deleted ? '删除成功' : '删除失败或无权限',
     }
-  }
+  },
 }

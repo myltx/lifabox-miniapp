@@ -16,10 +16,10 @@
       class="bg-white p-4 rounded-2xl shadow-md flex items-start justify-between"
     >
       <view>
-        <view class="text-lg font-semibold text-gray-800">{{ item.name }}</view>
+        <view class="text-lg font-semibold text-gray-800">{{ item.icon }} {{ item.name }}</view>
         <view class="text-sm text-gray-500 mt-1">{{ item.description }}</view>
       </view>
-      <text class="text-2xl text-gray-300">›</text>
+      <!-- <text class="text-2xl text-gray-300">›</text> -->
     </view>
 
     <!-- 新增按钮 -->
@@ -33,11 +33,17 @@
 </template>
 
 <script setup lang="ts">
-const categories = [
-  { name: '书籍', description: '包括纸质书、电子书、杂志等' },
-  { name: '电子产品', description: '手机、平板、电脑等设备' },
-  { name: '日用品', description: '生活中常用的物品，如洗漱用品' },
-]
+const itemCategories = uniCloud.importObject('itemCategories', {
+  customUI: true,
+})
+
+const categories = ref<any>([])
+
+onShow(async () => {
+  const data = await itemCategories.list({})
+  console.log(data, 'data')
+  categories.value = data.data || []
+})
 
 function goToCreate() {
   uni.navigateTo({ url: '/pages/item-categories/edit' })

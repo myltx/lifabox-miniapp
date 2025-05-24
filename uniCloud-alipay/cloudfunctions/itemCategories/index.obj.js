@@ -8,7 +8,7 @@ module.exports = {
   },
 
   // 添加分类
-  async add(params = {}) {
+  add: async function (params = {}) {
     const token = this.getUniIdToken()
     const { uid } = await this.uniID.checkToken(token)
 
@@ -21,9 +21,9 @@ module.exports = {
       icon: { type: 'string', required: false },
       sort_order: { type: 'number', required: false },
     }
-    this.middleware.validate(params, schema)
+    // this.middleware.validate(params, schema)
 
-    const { name, icon = '', sort_order = 0 } = params
+    const { name, icon = '', description = '', sort_order = 0 } = params
     const now = new Date()
 
     const db = uniCloud.database()
@@ -32,6 +32,7 @@ module.exports = {
     const res = await collection.add({
       user_id: uid,
       name,
+      description,
       icon,
       sort_order,
       created_at: now,
@@ -59,7 +60,7 @@ module.exports = {
       .where({
         $or: [
           { user_id: uid }, // 用户自定义
-          { user_id: '' },  // 系统默认
+          { user_id: '' }, // 系统默认
         ],
       })
       .orderBy('sort_order', 'asc')
@@ -71,28 +72,4 @@ module.exports = {
       data: res.data,
     }
   },
-
-  // 更新分类
-  async update(params = {}) {
-    const token = this.getUniIdToken()
-    const { uid } = await this.uniID.checkToken(token)
-
-    const { id, name, icon, sort_order } = params
-    if (!id) throw new Error('缺少分类 ID')
-
-    const db = uniCloud.database()
-    const collection = db.collection('item_categories')
-
-    const now = new Date()
-
-    const updateData = {
-      updated_at: now,
-    }
-    if (name !== undefined) updateData.name = name
-    if (icon !== undefined) updateData.icon = icon
-    if (sort_order !== undefined) updateData.sort_order = sort_order
-
-    const res = await collection
-      .where({
-        _id: id,
-        u
+}

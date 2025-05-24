@@ -102,6 +102,10 @@
 import { reactive, ref, computed } from 'vue'
 import { useToast } from 'wot-design-uni'
 
+const itemCategories = uniCloud.importObject('itemCategories', {
+  customUI: true,
+})
+
 const toast = useToast()
 
 // Emoji数据
@@ -373,24 +377,36 @@ const filteredEmojis = computed(() => {
   })
 })
 
-function submit() {
+async function submit() {
   if (!form.name) {
     toast.show('分类名称不能为空')
     return
   }
 
-  if (!form.icon) {
-    toast.show('请选择一个分类图标')
-    return
-  }
+  // if (!form.icon) {
+  //   toast.show('请选择一个分类图标')
+  //   return
+  // }
 
   // 获取选中的emoji信息
-  const emojiInfo = getEmojiInfo(form.icon)
+  console.log(form.icon, 'form.icon')
+  // const emojiInfo = getEmojiInfo(form.icon)
 
   // 构造提交数据
   const submitData = {
     ...form,
-    emojiInfo, // 包含完整的emoji信息
+    // icon: emojiInfo.emoji, // 包含完整的emoji信息
+  }
+
+  try {
+    await itemCategories.add(submitData)
+    console.log('提交成功')
+    toast.show('提交成功')
+    uni.navigateBack()
+  } catch (error) {
+    console.error('提交失败', error)
+    toast.show('提交失败: ' + error.message)
+    return
   }
 
   console.log('提交数据:', submitData)
